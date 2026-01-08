@@ -11,8 +11,8 @@ static const char *fonts[]          = { "Hack Mono Nerd Font:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#1e1e2e";
 static const char col_gray2[]       = "#313244";
-static const char col_gray3[]       = "#45475a";
-static const char col_gray4[]       = "#585b70";
+static const char col_gray3[]       = "#cdd6f4";
+static const char col_gray4[]       = "#cdd6f4";
 static const char col_cyan[]        = "#cba6f7";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
