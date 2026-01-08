@@ -28,11 +28,14 @@ static const int showsystray        = 1;        /* 0 means no systray */
 static const char *volup[]   = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
 static const char *voldown[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
 static const char *volmute[] = { "pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle", NULL };
+static const char *screenshot_full[] = { "sh", "-c", "maim | tee ~/Pictures/screenshot_$(date +%F_%T).png | xclip -selection clipboard -t image/png", NULL };
+static const char *screenshot_select[] = { "sh", "-c", "maim -s | tee ~/Pictures/screenshot_$(date +%F_%T).png | xclip -selection clipboard -t image/png", NULL };
 
 static const char *const autostart[] = {
 	"dunst", NULL,
 	"picom", NULL,
 	"xsettingsd", NULL,
+	"feh", "--bg-scale", "~/wall.png", NULL,
 	NULL /* terminate */
 };
 
@@ -87,6 +90,8 @@ static const Key keys[] = {
 	{ 0,                       XF86XK_AudioMute,        spawn, {.v = volmute } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	{ 0, XK_Print, spawn, {.v = screenshot_full } },
+	{ ShiftMask, XK_Print, spawn, {.v = screenshot_select } },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
