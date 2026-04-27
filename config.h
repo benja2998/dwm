@@ -47,7 +47,6 @@ static const Layout layouts[] = {
 };
 
 static const char *const autostart[] = {
-    "xfsettingsd", NULL,
     "dunst", NULL,
     "xfce4-power-manager", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
