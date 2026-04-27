@@ -82,6 +82,7 @@ static const char *termcmd[]  = { "alacritty", NULL };
 
 static const Key keys[] = {
     /* modifier                     key        function        argument */
+    {MODKEY|ShiftMask, XK_s, spawn, SHCMD("flameshot gui") }, 
     { 0,				XF86XK_MonBrightnessUp,		spawn,	{.v = light_up} },
     { 0,				XF86XK_MonBrightnessDown,	spawn,	{.v = light_down} },
     { 0,                       XF86XK_AudioLowerVolume, spawn, {.v = downvol } },
