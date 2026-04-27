@@ -48,6 +48,7 @@ static const Layout layouts[] = {
 
 static const char *const autostart[] = {
     "dunst", NULL,
+    "kdeconnectd", NULL,
     "xfce4-power-manager", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
     "feh", "--bg-scale", "/home/benjamin/Descargas/void-black-4k.png", NULL,
