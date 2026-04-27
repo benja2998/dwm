@@ -54,7 +54,7 @@ static const char *const autostart[] = {
     "feh", "--bg-scale", "/home/benjamin/Descargas/void-black-4k.png", NULL,
     "pipewire", NULL,
     "/home/benjamin/caps.sh", NULL,
-    "setxkbmap", "latam", NULL
+    "setxkbmap", "latam", NULL,
     NULL
 };
 
