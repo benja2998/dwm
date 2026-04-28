@@ -53,8 +53,7 @@ static const char *const autostart[] = {
     "picom", "--vsync", "--backend=glx", NULL,
     "feh", "--bg-scale", "/home/benjamin/Descargas/void-black-4k.png", NULL,
     "pipewire", NULL,
-    "setxkbmap", "-option", "ctrl:nocaps", NULL,
-    "setxkbmap", "latam", NULL,
+    "/home/benjamin/caps.sh", NULL,
     NULL
 };
 
