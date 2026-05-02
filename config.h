@@ -51,7 +51,7 @@ static const char *const autostart[] = {
     "kdeconnectd", NULL,
     "xfce4-power-manager", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
-    "feh", "--bg-scale", "/home/benjamin/Descargas/void-black-4k.png", NULL,
+    "feh", "--bg-scale", "/home/benjamin/Descargas/012.png", NULL,
     "pipewire", NULL,
     "/home/benjamin/caps.sh", NULL,
     NULL
