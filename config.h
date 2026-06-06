@@ -7,13 +7,13 @@ static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Iosevka Nerd Font:size=14" };
+static const char *fonts[]          = { "monospace:size=14" };
 static const char dmenufont[]       = "monospace:size=10";
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
+static const char col_gray1[]       = "#303446";
+static const char col_gray2[]       = "#414559";
+static const char col_gray3[]       = "#c6d0f5";
+static const char col_gray4[]       = "#303446";
+static const char col_cyan[]        = "#8caaee";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -49,11 +49,8 @@ static const Layout layouts[] = {
 static const char *const autostart[] = {
     "dunst", NULL,
     "kdeconnectd", NULL,
-    "xfce4-power-manager", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
-    "feh", "--bg-scale", "/home/benjamin/Descargas/012.png", NULL,
-    "pipewire", NULL,
-    "/home/benjamin/caps.sh", NULL,
+    "setxkbmap -option ctrl:nocaps", NULL,
     NULL
 };
 
@@ -76,8 +73,8 @@ static const char *light_down[] = { "/usr/bin/light",   "-U", "5", NULL };
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "/home/benjamin/dmenu-wrapper.sh", NULL };
-static const char *termcmd[]  = { "alacritty", NULL };
+static const char *dmenucmd[] = { "rofi -show drun", NULL };
+static const char *termcmd[]  = { "konsole", NULL };
 
 static const Key keys[] = {
     /* modifier                     key        function        argument */
@@ -90,6 +87,7 @@ static const Key keys[] = {
     { MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
     { MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
     { MODKEY,                       XK_b,      togglebar,      {0} },
+	{ MODKEY|ShiftMask,             XK_e,      spawn,          SHCMD("emacsclient -c -a \"\"") },
     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
     { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
     { MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
