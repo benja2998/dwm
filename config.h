@@ -50,7 +50,7 @@ static const char *const autostart[] = {
     "dunst", NULL,
     "kdeconnectd", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
-    "setxkbmap -option ctrl:nocaps", NULL,
+    "setxkbmap", "-option", "ctrl:nocaps", NULL,
     NULL
 };
 
@@ -73,7 +73,7 @@ static const char *light_down[] = { "/usr/bin/light",   "-U", "5", NULL };
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "rofi -show drun", NULL };
+static const char *dmenucmd[] = { "rofi", "-show", "drun", NULL };
 static const char *termcmd[]  = { "konsole", NULL };
 
 static const Key keys[] = {
