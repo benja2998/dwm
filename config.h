@@ -51,6 +51,7 @@ static const char *const autostart[] = {
     "kdeconnectd", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
     "setxkbmap", "-option", "ctrl:nocaps", NULL,
+	"/home/benjamin/date.sh", NULL,
     NULL
 };
 
