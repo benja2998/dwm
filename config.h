@@ -54,6 +54,7 @@ static const Layout layouts[] = {
 static const char *const autostart[] = {
     "dunst", NULL,
     "kdeconnectd", NULL,
+	"/usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1", NULL,
     "picom", "--vsync", "--backend=glx", NULL,
     "setxkbmap", "-option", "ctrl:nocaps", NULL,
 	"/home/benjamin/date.sh", NULL,
@@ -68,8 +69,8 @@ static const char *light_down[] = { "/usr/bin/light",   "-U", "5", NULL };
 
 /* key definitions */
 #define MODKEY Mod4Mask
-#define TAGKEYS(KEY,TAG) \
-{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
+#define TAGKEYS(KEY,TAG)												\
+	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 { MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
 { MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 { MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
