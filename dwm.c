@@ -170,7 +170,6 @@ static void attach(Client *c);
 static void attachaside(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
-static void buttonrelease(XEvent *e);
 static void checkotherwm(void);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
@@ -191,7 +190,6 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
-static int forwardsystrayevent(XEvent *e);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
@@ -261,7 +259,6 @@ static void updatewmhints(Client *c);
 static void view(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
-static Client *wintosystrayiconat(int x, int y);
 static Client *wintosystrayicon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
@@ -281,7 +278,6 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
-	[ButtonRelease] = buttonrelease,
 	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
 	[ConfigureNotify] = configurenotify,
@@ -503,9 +499,6 @@ buttonpress(XEvent *e)
 	Monitor *m;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	if (forwardsystrayevent(e))
-		return;
-
 	click = ClkRootWin;
 	/* focus monitor if necessary */
 	if ((m = wintomon(ev->window)) && m != selmon) {
@@ -537,12 +530,6 @@ buttonpress(XEvent *e)
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
-}
-
-void
-buttonrelease(XEvent *e)
-{
-	forwardsystrayevent(e);
 }
 
 void
@@ -640,8 +627,6 @@ clientmessage(XEvent *e)
 			updatesystrayicongeom(c, wa.width, wa.height);
 			XAddToSaveSet(dpy, c->win);
 			XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | ResizeRedirectMask);
-			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-				BUTTONMASK, GrabModeSync, GrabModeAsync, None, None);
 			XReparentWindow(dpy, c->win, systray->win, 0, 0);
 			swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
 			XChangeWindowAttributes(dpy, c->win, CWBackPixel, &swa);
@@ -1010,39 +995,6 @@ focusstack(const Arg *arg)
 		focus(c);
 		restack(selmon);
 	}
-}
-
-int
-forwardsystrayevent(XEvent *e)
-{
-	Client *i;
-	XButtonEvent *ev = &e->xbutton;
-	XEvent sendev = *e;
-
-	if (!showsystray || !systray)
-		return 0;
-
-	if ((i = wintosystrayicon(ev->window))) {
-		XAllowEvents(dpy, ReplayPointer, ev->time);
-		XFlush(dpy);
-		return 1;
-	}
-
-	if (ev->window != systray->win)
-		return 0;
-
-	if (!(i = wintosystrayicon(ev->subwindow)))
-		i = wintosystrayiconat(ev->x, ev->y);
-	if (!i)
-		return 1;
-
-	sendev.xbutton.window = i->win;
-	sendev.xbutton.subwindow = None;
-	sendev.xbutton.x = ev->x - i->x;
-	sendev.xbutton.y = ev->y - i->y;
-	XSendEvent(dpy, i->win, False, NoEventMask, &sendev);
-	XFlush(dpy);
-	return 1;
 }
 
 Atom
@@ -1525,7 +1477,6 @@ removesystrayicon(Client *i)
 	for (ii = &systray->icons; *ii && *ii != i; ii = &(*ii)->next);
 	if (*ii)
 		*ii = i->next;
-	XUngrabButton(dpy, AnyButton, AnyModifier, i->win);
 	free(i);
 }
 
@@ -2159,9 +2110,9 @@ updatebars(void)
 				CopyFromParent, DefaultVisual(dpy, screen),
 				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
 		XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
-		XMapRaised(dpy, m->barwin);
 		if (showsystray && systray && m == systraytomon(m))
 			XMapRaised(dpy, systray->win);
+		XMapRaised(dpy, m->barwin);
 		XSetClassHint(dpy, m->barwin, &ch);
 	}
 }
@@ -2406,7 +2357,7 @@ updatesystray(void)
 		if (!(systray = calloc(1, sizeof(Systray))))
 			die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
 		systray->win = XCreateSimpleWindow(dpy, root, x, m->by, w, bh, 0, 0, scheme[SchemeSel][ColBg].pixel);
-		wa.event_mask = BUTTONMASK | ExposureMask | SubstructureNotifyMask;
+		wa.event_mask = ButtonPressMask | ExposureMask;
 		wa.override_redirect = True;
 		wa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
 		XSelectInput(dpy, systray->win, SubstructureNotifyMask);
@@ -2527,20 +2478,6 @@ wintosystrayicon(Window w)
 		return i;
 	for (i = systray->icons; i && i->win != w; i = i->next);
 	return i;
-}
-
-Client *
-wintosystrayiconat(int x, int y)
-{
-	Client *i = NULL;
-
-	if (!showsystray || !systray)
-		return i;
-	for (i = systray->icons; i; i = i->next)
-		if (i->tags && x >= i->x && x < i->x + i->w
-		&& y >= i->y && y < i->y + i->h)
-			return i;
-	return NULL;
 }
 
 Monitor *
