@@ -640,6 +640,8 @@ clientmessage(XEvent *e)
 			updatesystrayicongeom(c, wa.width, wa.height);
 			XAddToSaveSet(dpy, c->win);
 			XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | ResizeRedirectMask);
+			XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+				BUTTONMASK, GrabModeSync, GrabModeAsync, None, None);
 			XReparentWindow(dpy, c->win, systray->win, 0, 0);
 			swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
 			XChangeWindowAttributes(dpy, c->win, CWBackPixel, &swa);
@@ -1017,7 +1019,16 @@ forwardsystrayevent(XEvent *e)
 	XButtonEvent *ev = &e->xbutton;
 	XEvent sendev = *e;
 
-	if (!showsystray || !systray || ev->window != systray->win)
+	if (!showsystray || !systray)
+		return 0;
+
+	if ((i = wintosystrayicon(ev->window))) {
+		XAllowEvents(dpy, ReplayPointer, ev->time);
+		XFlush(dpy);
+		return 1;
+	}
+
+	if (ev->window != systray->win)
 		return 0;
 
 	if (!(i = wintosystrayicon(ev->subwindow)))
@@ -1514,6 +1525,7 @@ removesystrayicon(Client *i)
 	for (ii = &systray->icons; *ii && *ii != i; ii = &(*ii)->next);
 	if (*ii)
 		*ii = i->next;
+	XUngrabButton(dpy, AnyButton, AnyModifier, i->win);
 	free(i);
 }
 
